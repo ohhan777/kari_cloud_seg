@@ -3,7 +3,7 @@ import argparse
 import torch
 from utils.kari_cloud_dataset import KariCloudDataset
 from utils.metrics import ConfusionMatrix
-from utils.loss import dice_loss
+from utils.loss import ce_loss
 import torch.optim as optim
 import time
 import wandb
@@ -17,8 +17,8 @@ def train(opt):
     name = opt.name
 
     # wandb settings
-    wandb.init(id=opt.name, resume='allow', project=Path(__file__).parent.stem)
-    wandb.config.update(opt)
+    # wandb.init(id=opt.name, resume='allow', project=Path(__file__).parent.stem)
+    # wandb.config.update(opt)
 
     # Train dataset
     train_dataset = KariCloudDataset('./data/kari-cloud-small', train=True, 
@@ -97,7 +97,7 @@ def train(opt):
         state = {'model': model.state_dict(), 'epoch': epoch, 'best_accuracy': best_accuracy}
         torch.save(state, weight_file)
         # wandb logging
-        wandb.log({'train_loss': epoch_loss, 'val_loss': val_epoch_loss, 'val_mean_iou': val_epoch_mean_iou, 'val_accuracy': val_epoch_pix_accuracy})
+        # wandb.log({'train_loss': epoch_loss, 'val_loss': val_epoch_loss, 'val_mean_iou': val_epoch_mean_iou, 'val_accuracy': val_epoch_pix_accuracy})
         
 def train_one_epoch(train_dataloader, model, optimizer, device):
     model.train()
@@ -105,7 +105,7 @@ def train_one_epoch(train_dataloader, model, optimizer, device):
     for i, (imgs, targets, _) in enumerate(train_dataloader):
         imgs, targets = imgs.to(device), targets.to(device)
         preds = model(imgs)['out']     # forward, preds: (B, C, H, W)
-        loss = dice_loss(preds, targets) # calculates the iteration loss  
+        loss = ce_loss(preds, targets) # calculates the iteration loss  
         optimizer.zero_grad()   # zeros the parameter gradients
         loss.backward()         # backward
         optimizer.step()        # update weights
@@ -122,7 +122,7 @@ def val_one_epoch(val_dataloader, model, confusion_matrix, device):
         imgs, targets = imgs.to(device), targets.to(device)
         with torch.no_grad():
             preds = model(imgs)['out']   # forward, preds: (B, C, H, W)
-            loss = dice_loss(preds, targets)
+            loss = ce_loss(preds, targets)
             losses.append(loss.item())
             preds = torch.argmax(preds, dim=1)  # (B, H, W)
             confusion_matrix.process_batch(preds, targets)
@@ -141,8 +141,8 @@ def val_one_epoch(val_dataloader, model, confusion_matrix, device):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=250, help='target epochs')
-    parser.add_argument('--batch-size', type=int, default=64, help='batch size')
-    parser.add_argument('--name', default='ohhan_cloud_dice', help='name for the run')
+    parser.add_argument('--batch-size', type=int, default=8, help='batch size')
+    parser.add_argument('--name', default='ohhan_cloud_adam_dice', help='name for the run')
 
     opt = parser.parse_args()
 

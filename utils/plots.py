@@ -67,7 +67,7 @@ def histogram_stretch(img, lower_percentile=2, upper_percentile=98):
 
 if __name__ == '__main__':
     os.makedirs('outputs', exist_ok=True)
-    img_file = 'data/kari-cloud-small/val/images/CLD00057_MS4_K3_NIA0057.tif'
+    img_file = 'data/kari-cloud-small/val/images/CLD00025_MS4_K3A_NIA0025.tif'
     label_file = img_file.replace('images', 'labels').replace('.tif', '.png')
 
     img = open_geotiff(img_file)  # (H, W, C) numpy array, RGB+NIR order, 14-bit image

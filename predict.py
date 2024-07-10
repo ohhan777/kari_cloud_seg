@@ -75,7 +75,7 @@ def predict(opt):
     recovery_mask = F.fold(torch.ones_like(pred_patches), output_size=(ph, pw), kernel_size=patch_size, stride=patch_stride)
     out /= recovery_mask
 
-    pred = torch.argmax(out, dim=1).squeeze(0)  # (H, W)
+    pred = torch.argmax(out, dim=1).squeeze(0)[:h, :w]  # (H, W) 
     save_file = os.path.join(opt.output, os.path.basename(opt.input).replace('.tif', '_pred.png'))
     plot_image(img, pred, save_file)
     print('Done')
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', type=str, required=True, help='Input image path')
     parser.add_argument('--output', '-o', type=str, default='./outputs', help='Output directory')
-    parser.add_argument('--weight', '-w', default='weights/ohhan_best.pth', help='Weight file path')
+    parser.add_argument('--weight', '-w', default='weights/ohhan_cloud_adam_ce_best.pth', help='Weight file path')
     parser.add_argument('--patch-size', type=int, default=800, help='Patch size')
     parser.add_argument('--patch-stride', type=int, default=400, help='Patch stride')
     opt = parser.parse_args()
