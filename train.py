@@ -16,9 +16,9 @@ def train(opt):
     batch_size = opt.batch_size
     name = opt.name
 
-    # wandb settings
-    # wandb.init(id=opt.name, resume='allow', project=Path(__file__).parent.stem)
-    # wandb.config.update(opt)
+    # wandb settings
+    wandb.init(id=opt.name, resume='allow', project=Path(__file__).parent.stem)
+    wandb.config.update(opt)
 
     # Train dataset
     train_dataset = KariCloudDataset('./data/kari-cloud-small', train=True, 
@@ -62,7 +62,7 @@ def train(opt):
         best_accuracy = checkpoint['best_accuracy']
         print('resumed from epoch %d' % start_epoch)
 
-    (img, label_img, img_file) = train_dataset[0]  # for debugging
+    # (img, label_img, img_file) = train_dataset[0]  # for debugging
     
     confusion_matrix = ConfusionMatrix(num_classes)
 
@@ -97,7 +97,7 @@ def train(opt):
         state = {'model': model.state_dict(), 'epoch': epoch, 'best_accuracy': best_accuracy}
         torch.save(state, weight_file)
         # wandb logging
-        # wandb.log({'train_loss': epoch_loss, 'val_loss': val_epoch_loss, 'val_mean_iou': val_epoch_mean_iou, 'val_accuracy': val_epoch_pix_accuracy})
+        wandb.log({'train_loss': epoch_loss, 'val_loss': val_epoch_loss, 'val_mean_iou': val_epoch_mean_iou, 'val_accuracy': val_epoch_pix_accuracy})
         
 def train_one_epoch(train_dataloader, model, optimizer, device):
     model.train()
