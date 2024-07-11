@@ -141,8 +141,8 @@ def val_one_epoch(val_dataloader, model, confusion_matrix, device):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=250, help='target epochs')
-    parser.add_argument('--batch-size', type=int, default=8, help='batch size')
-    parser.add_argument('--name', default='ohhan_cloud_adam_dice', help='name for the run')
+    parser.add_argument('--batch-size', type=int, default=4, help='batch size')
+    parser.add_argument('--name', default='ohhan_cloud_adam_ce', help='name for the run')
 
     opt = parser.parse_args()
 
